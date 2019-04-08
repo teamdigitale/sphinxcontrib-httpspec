@@ -2,15 +2,22 @@
 
 from __future__ import print_function
 
+import sys
+
+import sphinx
 from docutils import nodes
 from docutils.parsers.rst import roles
 from sphinx import addnodes
 from sphinx.errors import ExtensionError, SphinxError
-from sphinx.util.docutils import ReferenceRole
 
-try:
+if sphinx.version_info < (2,):
+    from .compat import ReferenceRole
+else:
+    from sphinx.util.docutils import ReferenceRole
+
+if sys.version_info < (3,):
     import httplib as httpclient
-except:
+else:
     import http.client as httpclient
 
 __author__ = "Team per la Trasformazione Digitale"
@@ -89,7 +96,6 @@ class HTTPRole(ReferenceRole):
     def build_uri(self):
         # type: () -> str
         base_url = "https://developer.mozilla.org/en-US/docs/Web/HTTP"
-
         return "/".join((base_url, HTTPRole.NAME_MAP[self.http_type], self.target))
 
 
@@ -101,10 +107,8 @@ def setup(app):
     :returns: Extension version.
     :rtype: dict
     """
-    print("Initializing Mozilla plugin")
-    # app.add_config_value('mozilla_url', None, 'html')
     roles.register_local_role("httpstatus", HTTPRole())
     roles.register_local_role("httpmethod", HTTPRole())
     roles.register_local_role("httpheader", HTTPRole())
 
-    return  # {'version': __version__}
+    return {"version": __version__}
