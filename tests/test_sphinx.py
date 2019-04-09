@@ -1,7 +1,11 @@
 from pathlib import Path
 from shlex import split
 from shutil import rmtree
-from subprocess import run
+
+try:
+    from subprocess import run
+except ImportError:
+    from subprocess import check_output as run
 
 
 def setup():
@@ -14,12 +18,14 @@ def setup():
 
 def test_sphinx():
     cmd = "sphinx-build -b html tests tests/_build/"
-    Path("tests/index.rst").write_text(
-        """ciao\n====\nCiao :httpstatus:`200`\nCiao :httpmethod:`POST`\nCiao :httpheader:`Location`\n\n"""
-    )
+    with open("tests/index.rst", "w") as fh:
+        fh.write(
+            """ciao\n====\nCiao :httpstatus:`200`\nCiao :httpmethod:`POST`\nCiao :httpheader:`Location`\n\n"""
+        )
     run(split(cmd))
 
-    results = Path("tests/_build/index.html").read_text()
+    with open("tests/_build/index.html") as fh:
+        results = fh.read()
     for needle in [
         "<strong>HTTP status 200  OK</strong>",
         "https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST",

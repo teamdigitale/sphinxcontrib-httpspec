@@ -6,7 +6,7 @@ import re
 from docutils.utils import unescape
 
 
-class SphinxRole:
+class SphinxRole(object):
     """A base class for Sphinx roles.
 
     This class provides helper methods for Sphinx roles.
@@ -97,4 +97,6 @@ class ReferenceRole(SphinxRole):
             self.title = unescape(text)
             self.target = unescape(text)
 
-        return super().__call__(name, rawtext, text, lineno, inliner, options, content)
+        return SphinxRole.__call__(
+            self, name, rawtext, text, lineno, inliner, options, content
+        )
